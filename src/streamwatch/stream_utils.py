@@ -2,7 +2,44 @@ import re
 from typing import Dict
 from urllib.parse import urlparse
 
+from .constants import QualitySettings
 from .models import UrlMetadata, UrlType
+
+
+def select_best_available_quality(
+    preferred_quality: str, available_qualities: list[str]
+) -> str:
+    """
+    Selects the best available stream quality based on a preferred quality and a fallback list.
+
+    Args:
+        preferred_quality: The user's desired quality (e.g., '1080p').
+        available_qualities: A list of qualities currently available for the stream.
+
+    Returns:
+        The best quality to use, falling back if the preferred one is not available.
+    """
+    if not available_qualities:
+        return preferred_quality
+
+    # If the preferred quality is directly available, use it
+    if preferred_quality in available_qualities:
+        return preferred_quality
+
+    # Find the starting point in the master fallback list
+    try:
+        start_index = QualitySettings.QUALITY_FALLBACK_ORDER.index(preferred_quality)
+    except ValueError:
+        # If preferred quality isn't in our master list, just return it and let streamlink handle it
+        return preferred_quality
+
+    # Iterate through the fallback list from the preferred quality downwards
+    for quality in QualitySettings.QUALITY_FALLBACK_ORDER[start_index:]:
+        if quality in available_qualities:
+            return quality
+
+    # As a last resort, if no matches were found (highly unlikely), return the original preference
+    return preferred_quality
 
 
 def _result(platform: str, username: str, url_type: str = "unknown") -> Dict[str, str]:

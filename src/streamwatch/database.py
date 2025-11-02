@@ -164,7 +164,7 @@ class StreamDatabase:
         """Get thread-local database connection."""
         if self._closed:
             raise DatabaseConnectionError("Database has been closed")
-            
+
         if not hasattr(self._local, "connection") or self._local.connection is None:
             try:
                 conn = sqlite3.connect(

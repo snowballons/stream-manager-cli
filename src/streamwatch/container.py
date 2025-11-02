@@ -177,38 +177,40 @@ class ServiceRegistry:
         from .commands import CommandInvoker
         from .menu_handler import MenuHandler
         from .playback_controller import PlaybackController
-        from .stream_manager import StreamManager
         from .stream_checker import StreamChecker
+        from .stream_manager import StreamManager
 
         logger.info("Configuring DI container with application services")
 
         # Register core services as singletons
         container.register_singleton("command_invoker", lambda: CommandInvoker())
 
-        from .database import get_database
+        # Register the enhanced database as a singleton
+        from .enhanced_database import create_enhanced_database
 
-        # Register the database as a singleton
-        container.register_singleton("database", lambda: get_database())
+        container.register_singleton("database", lambda: create_enhanced_database())
 
         # Register StreamChecker with dependencies
         def create_stream_checker():
             try:
                 from .cache import get_cache
+
                 cache = get_cache()
             except ImportError:
                 cache = None
-            
+
             try:
                 from .rate_limiter import get_rate_limiter
+
                 rate_limiter = get_rate_limiter()
             except ImportError:
                 rate_limiter = None
-            
+
             return StreamChecker(cache=cache, rate_limiter=rate_limiter)
 
         container.register_singleton("stream_checker", create_stream_checker)
 
-        # Register StreamManager and inject the database
+        # Register StreamManager and inject the enhanced database
         container.register_singleton(
             "stream_manager", lambda: StreamManager(database=container.get("database"))
         )

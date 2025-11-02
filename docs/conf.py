@@ -2,7 +2,6 @@
 Sphinx configuration for StreamWatch documentation.
 """
 
-import os
 import sys
 from pathlib import Path
 

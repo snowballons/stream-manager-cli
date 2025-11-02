@@ -5,7 +5,7 @@ import time
 import webbrowser
 from typing import Any, Dict, List
 
-from . import config, player, ui
+from . import config, player, stream_utils, ui
 
 logger = logging.getLogger(config.APP_NAME + ".playback_controller")
 
@@ -60,11 +60,34 @@ class PlaybackController:
                     f"Attempting to launch stream: {current_stream_info['url']}"
                 )
 
+                # --- QUALITY SELECTION LOGIC ---
+                available_qualities = player.fetch_available_qualities(
+                    current_stream_info["url"]
+                )
+                if available_qualities:
+                    final_quality = stream_utils.select_best_available_quality(
+                        current_quality, available_qualities
+                    )
+                    if final_quality != current_quality:
+                        logger.info(
+                            f"Preferred quality '{current_quality}' not available. Fell back to '{final_quality}'."
+                        )
+                        ui.console.print(
+                            f"Quality [bold yellow]{current_quality}[/bold yellow] not found, falling back to [bold green]{final_quality}[/bold green]."
+                        )
+                        current_quality = final_quality
+                else:
+                    logger.warning(
+                        f"Could not fetch available qualities for {current_stream_info['url']}. Using preferred quality '{current_quality}'."
+                    )
+                    final_quality = current_quality
+                # --- END QUALITY SELECTION ---
+
                 # --- PRE-PLAYBACK HOOK ---
-                player.execute_hook("pre", current_stream_info, current_quality)
+                player.execute_hook("pre", current_stream_info, final_quality)
 
                 player_process = player.launch_player_process(
-                    current_stream_info["url"], current_quality
+                    current_stream_info["url"], final_quality
                 )
 
                 if player_process:
@@ -76,7 +99,7 @@ class PlaybackController:
                     )
                 else:
                     # --- POST-PLAYBACK HOOK ON LAUNCH FAILURE ---
-                    player.execute_hook("post", current_stream_info, current_quality)
+                    player.execute_hook("post", current_stream_info, final_quality)
                     # --- Launch Failed ---
                     logger.warning(
                         f"Failed to launch player for {current_stream_info['url']}."

@@ -14,14 +14,10 @@ from .app import StreamWatchApp
 def setup_logging() -> None:
     """Sets up logging configuration for the application."""
     from .logging_config import setup_logging as setup_enhanced_logging
-    
+
     # Use enhanced logging configuration
-    setup_enhanced_logging(
-        log_level="INFO",
-        enable_console=True,
-        enable_colors=True
-    )
-    
+    setup_enhanced_logging(log_level="INFO", enable_console=True, enable_colors=True)
+
     logger = logging.getLogger(config.APP_NAME)
     logger.info("Enhanced logging system initialized")
 

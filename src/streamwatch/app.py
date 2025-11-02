@@ -145,7 +145,10 @@ class StreamWatchApp:
                 )
                 return []
 
-            live_streams = stream_checker.fetch_live_streams(all_configured_streams)
+            # Use async concurrent processing for better performance
+            live_streams = stream_checker.fetch_live_streams(
+                all_configured_streams, use_async=True
+            )
 
             if live_streams:
                 self.logger.info(f"Found {len(live_streams)} live streams")

@@ -164,6 +164,14 @@ class MenuHandler:
             result = self.command_invoker.execute_command(export_command)
             self.last_message = result.message
 
+        elif choice == "t":  # MANAGE TAGS
+            # Handle tag management
+            stream_manager.manage_tags()
+
+        elif choice == "h":  # EXPORT HISTORY & ANALYTICS
+            # Show export history
+            stream_manager.show_export_history()
+
         elif choice == "v":  # RECORDING CONTROLS
             from .recording_menu import RecordingMenuHandler
 

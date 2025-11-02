@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import validators
 
 from . import config
-from .constants import ValidationLimits, SecurityConstants
+from .constants import SecurityConstants, ValidationLimits
 
 logger = logging.getLogger(config.APP_NAME + ".validators")
 
@@ -112,12 +112,16 @@ def validate_url(url: str, strict: bool = True) -> Tuple[bool, str, Dict[str, An
     # Basic length check
     if len(url) > ValidationLimits.MAX_URL_LENGTH:
         raise ValidationError(
-            f"URL too long (max {ValidationLimits.MAX_URL_LENGTH} characters)", "url", url
+            f"URL too long (max {ValidationLimits.MAX_URL_LENGTH} characters)",
+            "url",
+            url,
         )
-    
+
     if len(url) < ValidationLimits.MIN_URL_LENGTH:
         raise ValidationError(
-            f"URL too short (min {ValidationLimits.MIN_URL_LENGTH} characters)", "url", url
+            f"URL too short (min {ValidationLimits.MIN_URL_LENGTH} characters)",
+            "url",
+            url,
         )
 
     # Check for dangerous patterns
@@ -233,7 +237,9 @@ def validate_alias(alias: str) -> str:
 
     if len(alias) > ValidationLimits.MAX_ALIAS_LENGTH:
         raise ValidationError(
-            f"Alias too long (max {ValidationLimits.MAX_ALIAS_LENGTH} characters)", "alias", alias
+            f"Alias too long (max {ValidationLimits.MAX_ALIAS_LENGTH} characters)",
+            "alias",
+            alias,
         )
 
     # Check for dangerous patterns
@@ -384,9 +390,11 @@ def validate_title(title: str) -> str:
         return ""
 
     # Check length
-    if len(title) > MAX_TITLE_LENGTH:
+    if len(title) > ValidationLimits.MAX_TITLE_LENGTH:
         raise ValidationError(
-            f"Title too long (max {MAX_TITLE_LENGTH} characters)", "title", title
+            f"Title too long (max {ValidationLimits.MAX_TITLE_LENGTH} characters)",
+            "title",
+            title,
         )
 
     # Check for dangerous patterns
@@ -434,9 +442,9 @@ def validate_file_path(
     path_str = str(file_path).strip()
 
     # Check length
-    if len(path_str) > MAX_FILE_PATH_LENGTH:
+    if len(path_str) > ValidationLimits.MAX_FILE_PATH_LENGTH:
         raise ValidationError(
-            f"File path too long (max {MAX_FILE_PATH_LENGTH} characters)",
+            f"File path too long (max {ValidationLimits.MAX_FILE_PATH_LENGTH} characters)",
             "file_path",
             path_str,
         )

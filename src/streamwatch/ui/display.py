@@ -69,18 +69,24 @@ def display_main_menu(live_streams_count: int) -> None:
         "]      - Remove configured stream(s)\n", style="menu_option"
     )
 
-    # --- NEW MENU OPTIONS ---
+    # --- ENHANCED DATABASE FEATURES ---
     text.append("  [", style="dimmed").append("I", style="menu_key").append(
-        "]      - Import streams from a .txt file\n", style="menu_option"
+        "]      - Import streams (.txt, .json, .m3u)\n", style="menu_option"
     )
     text.append("  [", style="dimmed").append("E", style="menu_key").append(
-        "]      - Export streams to a .json backup\n", style="menu_option"
+        "]      - Export streams (multiple formats)\n", style="menu_option"
+    )
+    text.append("  [", style="dimmed").append("T", style="menu_key").append(
+        "]      - Manage stream tags\n", style="menu_option"
+    )
+    text.append("  [", style="dimmed").append("H", style="menu_key").append(
+        "]      - Export history & analytics\n", style="menu_option"
     )
     text.append("  [", style="dimmed").append("V", style="menu_key").append(
         "]      - Recording controls\n", style="menu_option"
     )
 
-    # --- END NEW ---
+    # --- END ENHANCED FEATURES ---
 
     (
         text.append("  [", style="dimmed")
