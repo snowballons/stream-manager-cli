@@ -9,8 +9,8 @@ import logging
 import re
 from typing import Any, Dict, List, Optional
 
-from . import config
-from .validators import (
+from .. import config
+from ..validation.validators import (
     DANGEROUS_PATTERNS,
     SecurityError,
     ValidationError,
@@ -133,9 +133,9 @@ def safe_format_stream_info(stream_info: Dict[str, Any]) -> Dict[str, str]:
         try:
             count = int(viewer_count)
             if count >= 1000000:
-                safe_info["viewer_count"] = f"{count/1000000:.1f}M"
+                safe_info["viewer_count"] = f"{count / 1000000:.1f}M"
             elif count >= 1000:
-                safe_info["viewer_count"] = f"{count/1000:.1f}K"
+                safe_info["viewer_count"] = f"{count / 1000:.1f}K"
             else:
                 safe_info["viewer_count"] = str(count)
         except (ValueError, TypeError):

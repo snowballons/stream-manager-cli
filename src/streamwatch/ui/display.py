@@ -27,7 +27,7 @@ except ImportError:
 
 # Import pagination utilities
 try:
-    from .pagination import FilterCriteria, PaginationInfo
+    from .pagination import PaginationInfo
 
     PAGINATION_AVAILABLE = True
 except ImportError:

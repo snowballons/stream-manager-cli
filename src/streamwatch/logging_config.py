@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Optional
 
 from . import config
-from .constants import LoggingConstants
+from .core.constants import LoggingConstants
 
 
 class StreamWatchFormatter(logging.Formatter):
@@ -98,24 +98,6 @@ def set_module_log_level(module_name: str, level: str) -> None:
     """Set log level for a specific module."""
     logger = logging.getLogger(module_name)
     logger.setLevel(getattr(logging, level.upper()))
-
-
-# Performance logging utilities
-class PerformanceLogger:
-    """Logger for performance metrics."""
-
-    def __init__(self, name: str):
-        self.logger = logging.getLogger(f"{config.APP_NAME}.perf.{name}")
-
-    def log_duration(self, operation: str, duration: float, **kwargs) -> None:
-        """Log operation duration."""
-        extra_info = " ".join(f"{k}={v}" for k, v in kwargs.items())
-        self.logger.info(f"{operation} took {duration:.3f}s {extra_info}")
-
-    def log_count(self, operation: str, count: int, **kwargs) -> None:
-        """Log operation count."""
-        extra_info = " ".join(f"{k}={v}" for k, v in kwargs.items())
-        self.logger.info(f"{operation} processed {count} items {extra_info}")
 
 
 # Security logging utilities

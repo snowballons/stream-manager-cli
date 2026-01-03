@@ -1,8 +1,7 @@
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-import pytest
 
-from src.streamwatch.stream_checker import StreamCheckResult, _is_stream_live_core
+from src.streamwatch.stream_checker import _is_stream_live_core
 
 
 class TestStreamLivenessChecking:

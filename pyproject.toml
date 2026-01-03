@@ -82,6 +82,7 @@ dev = [
     "types-requests>=2.28.0",
     "build>=1.2.2.post1",
     "twine>=6.1.0",
+    "ruff>=0.14.10",
 ]
 docs = [
     "sphinx>=7.0.0",

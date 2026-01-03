@@ -1,7 +1,3 @@
-import json
-
-from ..models import StreamMetadata
-
 """
 Pagination and lazy loading utilities for StreamWatch UI.
 
@@ -9,13 +5,14 @@ This module provides pagination, search, and filtering capabilities for large st
 improving performance and user experience when dealing with many streams.
 """
 
+import json
 import logging
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import List, Optional, Tuple
 
 from .. import config
-from ..models import StreamInfo, StreamStatus
+from ..core.models import StreamInfo, StreamMetadata, StreamStatus
 
 logger = logging.getLogger(config.APP_NAME + ".ui.pagination")
 

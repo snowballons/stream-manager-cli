@@ -9,7 +9,7 @@ improved testability.
 import logging
 from typing import Any, Dict, List, Optional
 
-from . import config, stream_checker, ui
+from . import config, ui
 from .container import DIContainer, ServiceRegistry
 
 logger = logging.getLogger(config.APP_NAME + ".app")
@@ -146,7 +146,8 @@ class StreamWatchApp:
                 return []
 
             # Use async concurrent processing for better performance
-            live_streams = stream_checker.fetch_live_streams(
+            from .stream.checker import fetch_live_streams
+            live_streams = fetch_live_streams(
                 all_configured_streams, use_async=True
             )
 

@@ -1,6 +1,6 @@
 """Type stubs for streamlink library."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 def streams(url: str, **options: Any) -> Dict[str, Any]: ...
 

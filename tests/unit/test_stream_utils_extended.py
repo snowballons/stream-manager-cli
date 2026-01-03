@@ -1,7 +1,5 @@
 """Extended tests for stream_utils module."""
 
-import pytest
-
 from src.streamwatch.stream_utils import parse_url_metadata, parse_url_metadata_typed
 
 

@@ -3,10 +3,10 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from . import config, ui
-from .enhanced_database import EnhancedStreamDatabase
-from .models import StreamInfo
-from .stream_utils import parse_url_metadata
+from .. import config, ui
+from ..storage.database import StreamDatabase
+from ..core.models import StreamInfo
+from .utils import parse_url_metadata
 
 logger = logging.getLogger(config.APP_NAME + ".stream_manager")
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(config.APP_NAME + ".stream_manager")
 class StreamManager:
     """Handles stream CRUD operations with enhanced SQLite database."""
 
-    def __init__(self, database: EnhancedStreamDatabase):
+    def __init__(self, database: StreamDatabase):
         """Initialize the StreamManager with enhanced database dependency."""
         self.db = database
 

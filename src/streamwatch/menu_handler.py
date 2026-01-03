@@ -256,7 +256,7 @@ class MenuHandler:
             page_streams, pagination_info = manager.get_page(streams)
 
             # --- Lazy Loading Enrichment Step ---
-            from .models import StreamInfo
+            from .core.models import StreamInfo
             from .ui.pagination import get_lazy_loader
 
             lazy_loader = get_lazy_loader()

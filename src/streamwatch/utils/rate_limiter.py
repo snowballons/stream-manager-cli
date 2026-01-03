@@ -5,16 +5,14 @@ This module provides rate limiting functionality using the token bucket algorith
 to prevent overwhelming streaming platforms with too many requests.
 """
 
-import asyncio
 import logging
 import time
 from dataclasses import dataclass
 from threading import Lock
 from typing import Dict, Optional
-from urllib.parse import urlparse
 
-from . import config
-from .stream_utils import parse_url_metadata
+from .. import config
+from ..stream.utils import parse_url_metadata
 
 logger = logging.getLogger(config.APP_NAME + ".rate_limiter")
 

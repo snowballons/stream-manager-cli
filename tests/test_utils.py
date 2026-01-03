@@ -8,7 +8,7 @@ test coverage and reduce test code duplication.
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
@@ -154,18 +154,18 @@ def create_mock_config(**overrides) -> Mock:
 
 def assert_result_ok(result: Result, expected_value: Any = None) -> None:
     """Assert that Result is Ok with optional value check."""
-    assert (
-        result.is_ok()
-    ), f"Expected Ok result, got Err: {result.unwrap_err() if result.is_err() else 'N/A'}"
+    assert result.is_ok(), (
+        f"Expected Ok result, got Err: {result.unwrap_err() if result.is_err() else 'N/A'}"
+    )
     if expected_value is not None:
         assert result.unwrap() == expected_value
 
 
 def assert_result_err(result: Result, expected_error: str = None) -> None:
     """Assert that Result is Err with optional error message check."""
-    assert (
-        result.is_err()
-    ), f"Expected Err result, got Ok: {result.unwrap() if result.is_ok() else 'N/A'}"
+    assert result.is_err(), (
+        f"Expected Err result, got Ok: {result.unwrap() if result.is_ok() else 'N/A'}"
+    )
     if expected_error is not None:
         assert expected_error in str(result.unwrap_err())
 

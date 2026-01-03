@@ -16,17 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 # Import validation utilities
 try:
-    from .validation_utils import CommonValidators, validators_available_check
-    from .validators import (
-        SecurityError,
-        ValidationError,
-        validate_alias,
-        validate_category,
-        validate_title,
-        validate_url,
-        validate_username,
-        validate_viewer_count,
-    )
+    from ..validation.validators import CommonValidators
 
     VALIDATORS_AVAILABLE = True
 except ImportError:
@@ -583,79 +573,6 @@ class AppConfig(BaseModel):
                 self.max_workers_metadata, self.max_workers_liveness
             )
         return self
-
-
-# --- Data Serialization and Migration Utilities ---
-
-
-class ModelMigrator:
-    """Handles migration of legacy data formats to current Pydantic models."""
-
-    CURRENT_SCHEMA_VERSION = "1.0.0"
-
-    @classmethod
-    def migrate_stream_info_list(cls, data: List[Dict[str, Any]]) -> List[StreamInfo]:
-        """Migrate a list of stream info dictionaries."""
-        migrated_streams = []
-
-        for stream_data in data:
-            try:
-                stream = StreamInfo.from_dict(stream_data)
-                migrated_streams.append(stream)
-            except Exception as e:
-                # Log error but continue with other streams
-                print(f"Warning: Failed to migrate stream data: {e}")
-                continue
-
-        return migrated_streams
-
-    @classmethod
-    def migrate_config_data(cls, data: Dict[str, Any]) -> AppConfig:
-        """Migrate configuration data to AppConfig model."""
-        try:
-            return AppConfig.model_validate(data)
-        except Exception as e:
-            print(f"Warning: Failed to migrate config data, using defaults: {e}")
-            return AppConfig()
-
-    @classmethod
-    def validate_and_migrate_json(
-        cls, json_data: Dict[str, Any], model_class: type
-    ) -> Any:
-        """Generic validation and migration for any model class."""
-        try:
-            if hasattr(model_class, "from_dict"):
-                return model_class.from_dict(json_data)
-            else:
-                return model_class.model_validate(json_data)
-        except Exception as e:
-            print(f"Warning: Failed to validate {model_class.__name__}: {e}")
-            # Return a default instance if possible
-            try:
-                return model_class()
-            except Exception:
-                raise ValueError(
-                    f"Cannot create default instance of {model_class.__name__}"
-                )
-
-
-def serialize_to_json(obj: BaseModel) -> Dict[str, Any]:
-    """Serialize a Pydantic model to JSON-compatible dictionary."""
-    return obj.model_dump(mode="json", exclude_none=True)
-
-
-def deserialize_from_json(data: Dict[str, Any], model_class: type) -> Any:
-    """Deserialize JSON data to a Pydantic model with error handling."""
-    return ModelMigrator.validate_and_migrate_json(data, model_class)
-
-
-# --- Backward Compatibility Aliases ---
-
-
-# For existing code that might still use the old dataclass-style access
-def create_stream_info(url: str, alias: str, **kwargs) -> StreamInfo:
-    """Create StreamInfo with backward-compatible interface."""
-    return StreamInfo(url=url, alias=alias, **kwargs)
 
 
 def create_playback_session(

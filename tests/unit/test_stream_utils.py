@@ -1,5 +1,3 @@
-import pytest
-
 from src.streamwatch.stream_utils import parse_url_metadata
 
 

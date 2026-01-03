@@ -10,12 +10,12 @@ import logging
 import re
 import urllib.parse
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import validators
 
-from . import config
-from .constants import SecurityConstants, ValidationLimits
+from .. import config
+from ..core.constants import SecurityConstants, ValidationLimits
 
 logger = logging.getLogger(config.APP_NAME + ".validators")
 

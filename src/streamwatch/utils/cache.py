@@ -11,8 +11,8 @@ from dataclasses import dataclass
 from threading import Lock
 from typing import Dict, Optional
 
-from . import config
-from .models import StreamStatus
+from .. import config
+from ..core.models import StreamStatus
 
 logger = logging.getLogger(config.APP_NAME + ".cache")
 

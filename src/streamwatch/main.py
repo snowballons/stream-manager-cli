@@ -1,7 +1,6 @@
 import logging  # Import logging
 import subprocess
 import sys
-from logging.handlers import RotatingFileHandler  # For log rotation
 
 from . import config  # To get USER_CONFIG_DIR
 from . import ui  # For clear_screen
@@ -60,31 +59,6 @@ def main() -> None:
     setup_logging()
     logger = logging.getLogger(config.APP_NAME)
     logger.info("StreamWatch application started.")
-
-    # --- Automatic Migration from JSON to SQLite ---
-    try:
-        from .migration import DataMigrator
-
-        migrator = DataMigrator()
-        # The perform_migration function now handles the check internally
-        logger.info("Checking for and performing data migration if needed.")
-        result = migrator.perform_migration(create_backup=True)
-
-        if not result.get("success"):
-            ui.console.print(f"[red]Migration failed: {result['message']}[/red]")
-            logger.critical(f"Migration failed: {result['message']}")
-            sys.exit(1)
-
-        if (
-            result.get("streams_migrated", 0) > 0
-            or result.get("config_migrated", 0) > 0
-        ):
-            ui.console.print("[green]Data migration completed successfully.[/green]")
-
-    except Exception as e:
-        logger.critical(f"Migration check/operation failed: {e}", exc_info=True)
-        ui.console.print(f"[red]Migration check/operation failed: {e}[/red]")
-        sys.exit(1)
 
     if not initial_streamlink_check():
         logger.critical("Streamlink check failed. Application cannot continue.")

@@ -5,7 +5,7 @@ import time
 import webbrowser
 from typing import Any, Dict, List
 
-from . import config, player, stream_utils, ui
+from . import config, player, ui
 
 logger = logging.getLogger(config.APP_NAME + ".playback_controller")
 
@@ -65,7 +65,8 @@ class PlaybackController:
                     current_stream_info["url"]
                 )
                 if available_qualities:
-                    final_quality = stream_utils.select_best_available_quality(
+                    from .stream.utils import select_best_available_quality
+                    final_quality = select_best_available_quality(
                         current_quality, available_qualities
                     )
                     if final_quality != current_quality:

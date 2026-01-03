@@ -5,7 +5,7 @@ This module provides a Result type that encapsulates success/failure states,
 eliminating the need for mixed exception/return code patterns.
 """
 
-from typing import Any, Callable, Generic, Optional, TypeVar, Union
+from typing import Any, Callable, Generic, Optional, TypeVar
 
 T = TypeVar("T")  # Success type
 E = TypeVar("E")  # Error type

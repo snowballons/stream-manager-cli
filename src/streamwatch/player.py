@@ -203,6 +203,6 @@ def fetch_available_qualities(url_to_check: str) -> Optional[List[str]]:
         else:
             logger.warning(f"streamlink did not return valid output for {url_to_check}")
             return None
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error fetching available qualities for {url_to_check}")
         return None

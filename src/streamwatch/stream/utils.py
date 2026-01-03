@@ -2,8 +2,8 @@ import re
 from typing import Dict
 from urllib.parse import urlparse
 
-from .constants import QualitySettings
-from .models import UrlMetadata, UrlType
+from ..core.constants import QualitySettings
+from ..core.models import UrlMetadata, UrlType
 
 
 def select_best_available_quality(

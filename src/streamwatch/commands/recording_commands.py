@@ -1,7 +1,7 @@
 """Recording-related commands for StreamWatch."""
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from ..recording import recording_manager
 from .base import Command, CommandResult

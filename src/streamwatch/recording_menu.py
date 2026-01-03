@@ -1,14 +1,13 @@
 """Recording menu handler for StreamWatch."""
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
 from .recording import recording_manager
-from .ui.input_handler import prompt_main_menu_action
 
 logger = logging.getLogger("streamwatch.recording_menu")
 

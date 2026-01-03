@@ -9,12 +9,12 @@ import logging
 import sqlite3
 import threading
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-from . import config
-from .models import AppConfig, StreamInfo, StreamStatus
+from .. import config
+from ..core.models import StreamInfo, StreamStatus
 
 logger = logging.getLogger(config.APP_NAME + ".database")
 
@@ -118,10 +118,6 @@ class DatabaseConnectionError(DatabaseError):
     pass
 
 
-class DatabaseMigrationError(DatabaseError):
-    """Exception raised during database migrations."""
-
-    pass
 
 
 class StreamDatabase:
@@ -233,7 +229,12 @@ class StreamDatabase:
                 # Check/update schema version
                 current_version = self._get_schema_version()
                 if current_version < SCHEMA_VERSION:
-                    self._migrate_schema(current_version, SCHEMA_VERSION)
+                    # Simple schema update
+                    conn.execute(
+                        "INSERT INTO schema_info (version, description) VALUES (?, ?)",
+                        (SCHEMA_VERSION, f"Schema version {SCHEMA_VERSION}"),
+                    )
+                    logger.info(f"Database schema updated to v{SCHEMA_VERSION}")
 
                 logger.debug("Database schema initialized successfully")
 
@@ -249,25 +250,6 @@ class StreamDatabase:
                 return result[0] if result[0] is not None else 0
         except sqlite3.Error:
             return 0
-
-    def _migrate_schema(self, from_version: int, to_version: int) -> None:
-        """Migrate database schema from one version to another."""
-        logger.info(f"Migrating database schema from v{from_version} to v{to_version}")
-
-        try:
-            with self.transaction() as conn:
-                # Record migration
-                conn.execute(
-                    "INSERT INTO schema_info (version, description) VALUES (?, ?)",
-                    (to_version, f"Migration from v{from_version} to v{to_version}"),
-                )
-
-                logger.info(
-                    f"Database migration completed: v{from_version} -> v{to_version}"
-                )
-
-        except sqlite3.Error as e:
-            raise DatabaseMigrationError(f"Schema migration failed: {e}")
 
     def close(self) -> None:
         """Close database connection and mark as closed."""

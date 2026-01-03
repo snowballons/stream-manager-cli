@@ -1,8 +1,7 @@
 """Unit tests for UI components module."""
 
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-import pytest
 
 from src.streamwatch.ui import display, input_handler
 

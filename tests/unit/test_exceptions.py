@@ -1,7 +1,5 @@
 """Tests for exceptions module."""
 
-import pytest
-
 from src.streamwatch.exceptions import (
     AuthenticationError,
     NetworkError,

@@ -26,7 +26,7 @@ try:
         sanitize_user_input,
         validate_ui_command,
     )
-    from ..validators import SecurityError, ValidationError
+    from ..validation.validators import SecurityError
 
     SECURITY_AVAILABLE = True
 except ImportError:
@@ -65,7 +65,7 @@ def prompt_for_filepath(
 
         # Try validation if available, but don't fail if validator has issues
         try:
-            from ..validators import ValidationError, validate_file_path
+            from ..validation.validators import ValidationError, validate_file_path
 
             validated_path = validate_file_path(raw_path)
             return str(validated_path)

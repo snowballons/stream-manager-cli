@@ -1,7 +1,5 @@
 """Tests for the models module."""
 
-from datetime import datetime
-
 import pytest
 
 from src.streamwatch.models import (
