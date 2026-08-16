@@ -19,7 +19,7 @@ from .styles import console, dialog_style, playback_menu_style
 
 # Import security utilities
 try:
-    from ..ui_security import (
+    from .security import (
         UISecurityError,
         log_user_action,
         safe_format_error_message,

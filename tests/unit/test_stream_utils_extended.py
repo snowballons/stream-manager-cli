@@ -1,6 +1,6 @@
 """Extended tests for stream_utils module."""
 
-from src.streamwatch.stream_utils import parse_url_metadata, parse_url_metadata_typed
+from src.streamwatch.stream.utils import parse_url_metadata, parse_url_metadata_typed
 
 
 class TestParseUrlMetadataExtended:

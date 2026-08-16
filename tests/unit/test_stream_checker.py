@@ -1,11 +1,11 @@
 from unittest.mock import patch
 
 
-from src.streamwatch.stream_checker import _is_stream_live_core
+from src.streamwatch.stream.checker import _is_stream_live_core
 
 
 class TestStreamLivenessChecking:
-    @patch("src.streamwatch.stream_checker.subprocess.run")
+    @patch("src.streamwatch.stream.checker.subprocess.run")
     def test_is_stream_live_success(self, mock_run):
         """Test successful stream liveness check."""
         mock_run.return_value.returncode = 0
@@ -17,7 +17,7 @@ class TestStreamLivenessChecking:
         assert result.url == "https://test.tv/user"
         assert result.error is None
 
-    @patch("src.streamwatch.stream_checker.subprocess.run")
+    @patch("src.streamwatch.stream.checker.subprocess.run")
     def test_is_stream_live_offline(self, mock_run):
         """Test stream offline detection."""
         mock_run.return_value.returncode = 1
@@ -29,7 +29,7 @@ class TestStreamLivenessChecking:
         assert result.url == "https://test.tv/offline_user"
         assert result.error is not None
 
-    @patch("src.streamwatch.stream_checker.subprocess.run")
+    @patch("src.streamwatch.stream.checker.subprocess.run")
     def test_is_stream_live_timeout(self, mock_run):
         """Test stream check timeout handling."""
         from subprocess import TimeoutExpired

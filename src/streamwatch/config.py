@@ -19,6 +19,7 @@ DEFAULT_CONFIG: Dict[str, Dict[str, str]] = {
         "max_workers_liveness": "4",
         "max_workers_metadata": "2",  # Often fewer streams need metadata fetch
         "twitch_disable_ads": "true",
+        "player": "mpv",  # Default media player
     },
     "Resilience": {
         # Retry configuration
@@ -232,6 +233,13 @@ def get_twitch_disable_ads() -> bool:
         "Streamlink",
         "twitch_disable_ads",
         fallback=DEFAULT_CONFIG["Streamlink"]["twitch_disable_ads"].lower() == "true",
+    )
+
+
+def get_streamlink_player() -> str:
+    """Get the configured media player."""
+    return config_parser.get(
+        "Streamlink", "player", fallback=DEFAULT_CONFIG["Streamlink"]["player"]
     )
 
 

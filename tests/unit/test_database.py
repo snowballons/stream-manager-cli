@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from src.streamwatch.database import StreamDatabase
-from src.streamwatch.models import StreamInfo
+from src.streamwatch.storage.database import StreamDatabase
+from src.streamwatch.core.models import StreamInfo
 
 
 @pytest.fixture

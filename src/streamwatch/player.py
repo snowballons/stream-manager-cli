@@ -96,12 +96,15 @@ def launch_player_process(url_to_play: str, quality: str) -> Optional[subprocess
     if config.get_twitch_disable_ads() and "twitch.tv" in url_to_play:
         command.append("--twitch-disable-ads")
 
+    # Add player configuration
+    player_name = config.get_streamlink_player()
+    if player_name:
+        command.extend(["--player", player_name])
+
     command.extend(
         [
             url_to_play,
             quality,
-            # Add other streamlink options if needed, e.g., --player "mpv --args..."
-            # For simplicity, rely on streamlink's default player (MPV assumed)
         ]
     )
 

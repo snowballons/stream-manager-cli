@@ -1,6 +1,6 @@
 """Tests for exceptions module."""
 
-from src.streamwatch.exceptions import (
+from src.streamwatch.core.exceptions import (
     AuthenticationError,
     NetworkError,
     RateLimitExceededError,

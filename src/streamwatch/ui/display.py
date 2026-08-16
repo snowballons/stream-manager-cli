@@ -19,7 +19,7 @@ from .styles import STREAM_DISPLAY_COLORS, console, dialog_style
 
 # Import security utilities
 try:
-    from ..ui_security import safe_format_for_display, safe_format_stream_info
+    from .security import safe_format_for_display, safe_format_stream_info
 
     SECURITY_AVAILABLE = True
 except ImportError:

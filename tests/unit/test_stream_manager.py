@@ -4,8 +4,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.streamwatch.models import StreamInfo
-from src.streamwatch.stream_manager import StreamManager
+from src.streamwatch.core.models import StreamInfo
+from src.streamwatch.stream.manager import StreamManager
 
 
 # Mock the database dependency for all tests in this class
@@ -24,7 +24,7 @@ def manager(mock_db):
 class TestStreamManager:
     """Test StreamManager functionality with mocked dependencies."""
 
-    @patch("src.streamwatch.stream_manager.ui")
+    @patch("src.streamwatch.stream.manager.ui")
     def test_add_streams_success(self, mock_ui, manager, mock_db):
         """Test successful stream addition delegation."""
         mock_ui.prompt_add_streams.return_value = [
@@ -38,7 +38,7 @@ class TestStreamManager:
         mock_ui.prompt_add_streams.assert_called_once()
         mock_db.save_stream.assert_called_once()
 
-    @patch("src.streamwatch.stream_manager.ui")
+    @patch("src.streamwatch.stream.manager.ui")
     def test_add_streams_cancelled(self, mock_ui, manager):
         """Test cancelled stream addition."""
         mock_ui.prompt_add_streams.return_value = []
@@ -48,7 +48,7 @@ class TestStreamManager:
         assert success is False
         assert "cancelled" in message
 
-    @patch("src.streamwatch.stream_manager.ui")
+    @patch("src.streamwatch.stream.manager.ui")
     def test_remove_streams_success(self, mock_ui, manager, mock_db):
         """Test successful stream removal delegation."""
         mock_stream = StreamInfo(url="https://twitch.tv/test", alias="Test")
@@ -63,7 +63,7 @@ class TestStreamManager:
         mock_db.load_streams.assert_called_once()
         mock_db.delete_stream.assert_called_with("https://twitch.tv/test")
 
-    @patch("src.streamwatch.stream_manager.ui")
+    @patch("src.streamwatch.stream.manager.ui")
     def test_list_streams(self, mock_ui, manager, mock_db):
         """Test listing streams delegation."""
         mock_db.load_streams.return_value = []

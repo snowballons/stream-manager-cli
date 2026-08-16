@@ -10,7 +10,7 @@ import logging
 import re
 import urllib.parse
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Tuple, TypeVar, Union
 
 import validators
 
@@ -18,6 +18,8 @@ from .. import config
 from ..core.constants import SecurityConstants, ValidationLimits
 
 logger = logging.getLogger(config.APP_NAME + ".validators")
+
+T = TypeVar("T")
 
 # Compile regex patterns for better performance
 ALIAS_ALLOWED_CHARS = re.compile(SecurityConstants.ALIAS_PATTERN)
@@ -708,3 +710,64 @@ def sanitize_for_logging(data: Any, max_length: int = 100) -> str:
 
     except Exception:
         return "[SANITIZATION_ERROR]"
+
+
+class CommonValidators:
+    """
+    Collection of commonly used validators with consistent error handling.
+
+    Compatibility shim: models.py imports this class and calls its static
+    methods. The underlying logic lives in the module-level functions above.
+    ValidationError/SecurityError are converted to ValueError so the methods
+    are safe to use directly as Pydantic field validators.
+    """
+
+    @staticmethod
+    def _as_value_error(
+        func: Callable[..., T], value: Any
+    ) -> T:
+        try:
+            return func(value)
+        except (ValidationError, SecurityError) as e:
+            raise ValueError(str(e)) from e
+
+    @staticmethod
+    def url_validator(value: str) -> str:
+        """Validate URL and return the sanitized URL."""
+        try:
+            _, sanitized_url, _ = validate_url(value, strict=False)
+            return sanitized_url
+        except (ValidationError, SecurityError) as e:
+            raise ValueError(str(e)) from e
+
+    @staticmethod
+    def alias_validator(value: str) -> str:
+        """Validate alias."""
+        return CommonValidators._as_value_error(validate_alias, value)
+
+    @staticmethod
+    def username_validator(value: str) -> str:
+        """Validate username."""
+        return CommonValidators._as_value_error(validate_username, value)
+
+    @staticmethod
+    def category_validator(value: str) -> str:
+        """Validate category."""
+        return CommonValidators._as_value_error(validate_category, value)
+
+    @staticmethod
+    def title_validator(value: str) -> str:
+        """Validate title."""
+        return CommonValidators._as_value_error(validate_title, value)
+
+    @staticmethod
+    def viewer_count_validator(value: Union[int, str, None]) -> Optional[int]:
+        """Validate viewer count."""
+        return validate_viewer_count(value)
+
+    @staticmethod
+    def quality_validator(value: str) -> str:
+        """Validate quality string."""
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("Quality must be a non-empty string")
+        return value.strip()

@@ -1,4 +1,3 @@
-import asyncio  # For async/await support
 import json  # For parsing --json output
 import logging  # Import logging
 import re
@@ -592,19 +591,18 @@ def is_stream_live_for_check_detailed(url: str) -> StreamCheckResult:
             logger.warning(f"Rate limit exceeded for {url}")
             return StreamCheckResult(is_live=False, url=url, error=error)
 
-    # Cache miss or caching disabled - perform actual check
-    else:
-        try:
-            # Use simple retry logic
-            result = simple_retry(_is_stream_live_core, url)
+    # Perform actual check (either rate limiting disabled or rate limit passed)
+    try:
+        # Use simple retry logic
+        result = simple_retry(_is_stream_live_core, url)
 
-        except Exception as e:
-            # Handle any exceptions from retry
-            if isinstance(e, StreamlinkError):
-                result = StreamCheckResult(is_live=False, url=url, error=e)
-            else:
-                error = StreamlinkError(f"Stream check error: {str(e)}", url=url)
-                result = StreamCheckResult(is_live=False, url=url, error=error)
+    except Exception as e:
+        # Handle any exceptions from retry
+        if isinstance(e, StreamlinkError):
+            result = StreamCheckResult(is_live=False, url=url, error=e)
+        else:
+            error = StreamlinkError(f"Stream check error: {str(e)}", url=url)
+            result = StreamCheckResult(is_live=False, url=url, error=error)
 
     # Update cache with the result if caching is enabled
     if config.get_cache_enabled():
@@ -965,17 +963,7 @@ def fetch_live_streams(
 
     logger.info(f"Checking {len(all_configured_streams_data)} streams for liveness...")
 
-    if use_async and len(all_configured_streams_data) > 1:
-        # Use async concurrent processing for better performance
-        try:
-            return asyncio.run(
-                _fetch_live_streams_async_impl(all_configured_streams_data)
-            )
-        except Exception as e:
-            logger.warning(f"Async processing failed, falling back to threading: {e}")
-            # Fall through to threading implementation
-
-    # Fallback to original threading implementation
+    # Use threading implementation (async module not available)
     # Phase 1: Optimized batch liveness check
     live_stream_candidates = _batch_check_liveness(all_configured_streams_data)
 
@@ -993,23 +981,6 @@ def fetch_live_streams(
     # Return the list of enhanced objects, converted to dictionaries for compatibility
     return [s.model_dump() for s in live_streams_info]
 
-
-async def _fetch_live_streams_async_impl(
-    all_configured_streams_data: List[Dict[str, str]]
-) -> List[Dict[str, Any]]:
-    """
-    Internal async implementation for fetch_live_streams.
-
-    Args:
-        all_configured_streams_data: List of configured stream dictionaries
-
-    Returns:
-        List of live stream info dictionaries
-    """
-    from .async_stream_checker import create_async_stream_checker
-
-    checker = create_async_stream_checker()
-    return await checker.fetch_live_streams_async(all_configured_streams_data)
 
 
 def _batch_check_liveness(
@@ -1443,18 +1414,12 @@ def check_multiple_streams_concurrent(
     if not urls:
         return []
 
-    try:
-        from .async_stream_checker import check_multiple_streams_async
-
-        return asyncio.run(check_multiple_streams_async(urls))
-    except Exception as e:
-        logger.warning(f"Async concurrent checking failed: {e}")
-        # Fallback to synchronous checking
-        results = []
-        for url in urls:
-            result = check_stream_liveness_safe(url)
-            results.append((url, result))
-        return results
+    # Use synchronous checking (async module not available)
+    results = []
+    for url in urls:
+        result = check_stream_liveness_safe(url)
+        results.append((url, result))
+    return results
 
 
 def fetch_live_streams_concurrent(

@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.streamwatch.models import (
+from src.streamwatch.core.models import (
     PlaybackSession,
     StreamInfo,
     StreamStatus,

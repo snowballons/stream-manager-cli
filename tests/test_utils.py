@@ -12,7 +12,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.streamwatch.models import StreamInfo, StreamStatus
+from src.streamwatch.core.models import StreamInfo, StreamStatus
 from src.streamwatch.result import Result
 
 

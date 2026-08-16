@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.streamwatch.validators import (
+from src.streamwatch.validation.validators import (
     SecurityError,
     ValidationError,
     sanitize_html,

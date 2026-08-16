@@ -19,7 +19,7 @@ from ..core.models import StreamInfo, StreamStatus
 logger = logging.getLogger(config.APP_NAME + ".database")
 
 # Database schema version for migrations
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # SQL schema definitions
 SCHEMA_SQL = """
@@ -89,6 +89,17 @@ CREATE TABLE IF NOT EXISTS stream_preferences (
     FOREIGN KEY (stream_url) REFERENCES streams(url) ON DELETE CASCADE
 );
 
+-- Stream tags table
+CREATE TABLE IF NOT EXISTS stream_tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    stream_url TEXT NOT NULL,
+    name TEXT NOT NULL,
+    color TEXT DEFAULT '#007acc',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (stream_url) REFERENCES streams(url) ON DELETE CASCADE,
+    UNIQUE(stream_url, name)
+);
+
 -- Performance indexes
 CREATE INDEX IF NOT EXISTS idx_stream_checks_url_time ON stream_checks(stream_url, checked_at);
 CREATE INDEX IF NOT EXISTS idx_stream_checks_status ON stream_checks(status);
@@ -96,6 +107,7 @@ CREATE INDEX IF NOT EXISTS idx_stream_checks_time ON stream_checks(checked_at);
 CREATE INDEX IF NOT EXISTS idx_streams_platform ON streams(platform_id);
 CREATE INDEX IF NOT EXISTS idx_streams_active ON streams(is_active);
 CREATE INDEX IF NOT EXISTS idx_streams_alias ON streams(alias);
+CREATE INDEX IF NOT EXISTS idx_stream_tags_url ON stream_tags(stream_url);
 
 -- Insert default platforms
 INSERT OR IGNORE INTO platforms (name, base_url, rate_limit_requests_per_second, rate_limit_burst_capacity) VALUES
@@ -229,17 +241,29 @@ class StreamDatabase:
                 # Check/update schema version
                 current_version = self._get_schema_version()
                 if current_version < SCHEMA_VERSION:
-                    # Simple schema update
-                    conn.execute(
-                        "INSERT INTO schema_info (version, description) VALUES (?, ?)",
-                        (SCHEMA_VERSION, f"Schema version {SCHEMA_VERSION}"),
-                    )
+                    self._migrate_schema(conn, current_version, SCHEMA_VERSION)
                     logger.info(f"Database schema updated to v{SCHEMA_VERSION}")
 
                 logger.debug("Database schema initialized successfully")
 
         except sqlite3.Error as e:
             raise DatabaseError(f"Failed to initialize database: {e}")
+
+    def _migrate_schema(self, conn: sqlite3.Connection, from_version: int, to_version: int) -> None:
+        """Migrate database schema between versions."""
+        logger.info(f"Migrating database schema from v{from_version} to v{to_version}")
+
+        # The v2 stream_tags table and its index are already created by SCHEMA_SQL
+        # (CREATE TABLE/INDEX IF NOT EXISTS run on every init), so no DDL is
+        # needed here. Future migrations add their DDL in this method.
+
+        # Update schema version
+        conn.execute(
+            "INSERT INTO schema_info (version, description) VALUES (?, ?)",
+            (to_version, f"Schema migration to version {to_version}"),
+        )
+
+        logger.info(f"Database migration completed: v{from_version} -> v{to_version}")
 
     def _get_schema_version(self) -> int:
         """Get current database schema version."""
@@ -960,6 +984,70 @@ class StreamDatabase:
 
         except sqlite3.Error as e:
             raise DatabaseError(f"Failed to get all config: {e}")
+
+    # --- Stream Tags Operations ---
+
+    def add_stream_tag(self, stream_url: str, tag_name: str, color: str = "#007acc") -> bool:
+        """
+        Add a tag to a stream.
+
+        Args:
+            stream_url: Stream URL
+            tag_name: Tag name
+            color: Tag color (hex format)
+
+        Returns:
+            True if tag was added, False if it already exists
+        """
+        try:
+            with self.transaction() as conn:
+                cursor = conn.execute(
+                    "INSERT OR IGNORE INTO stream_tags (stream_url, name, color) VALUES (?, ?, ?)",
+                    (stream_url, tag_name, color)
+                )
+                return cursor.rowcount > 0
+        except sqlite3.Error as e:
+            raise DatabaseError(f"Failed to add stream tag: {e}")
+
+    def get_stream_tags(self, stream_url: str) -> List[Dict[str, Any]]:
+        """
+        Get all tags for a stream.
+
+        Args:
+            stream_url: Stream URL
+
+        Returns:
+            List of tag dictionaries
+        """
+        try:
+            cursor = self.connection.execute(
+                "SELECT name, color, created_at FROM stream_tags WHERE stream_url = ? ORDER BY name",
+                (stream_url,)
+            )
+            return [dict(row) for row in cursor.fetchall()]
+        except sqlite3.Error as e:
+            raise DatabaseError(f"Failed to get stream tags: {e}")
+
+    def remove_stream_tag(self, stream_url: str, tag_name: str) -> bool:
+        """
+        Remove a tag from a stream.
+
+        Args:
+            stream_url: Stream URL
+            tag_name: Tag name to remove
+
+        Returns:
+            True if tag was removed, False if it didn't exist
+        """
+        try:
+            with self.transaction() as conn:
+                cursor = conn.execute(
+                    "DELETE FROM stream_tags WHERE stream_url = ? AND name = ?",
+                    (stream_url, tag_name)
+                )
+                return cursor.rowcount > 0
+        except sqlite3.Error as e:
+            raise DatabaseError(f"Failed to remove stream tag: {e}")
 
 
 # Global database instance
